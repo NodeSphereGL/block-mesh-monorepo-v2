@@ -1,5 +1,6 @@
 use crate::constants::DeviceType;
-use reqwest::{Client, ClientBuilder, Proxy};
+extern crate reqwest as reqwest_crate;
+use reqwest_crate::{Client, ClientBuilder, Proxy};
 #[allow(unused_imports)]
 use std::{env, time::Duration};
 
