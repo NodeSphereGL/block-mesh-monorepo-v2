@@ -1,12 +1,12 @@
 use crate::background::operation_mode::OperationMode;
 use crate::utils::connectors::set_panic_hook;
 use crate::utils::extension_wrapper_state::ExtensionWrapperState;
+use crate::utils::requests::http_client;
 use block_mesh_common::chrome_storage::AuthStatus;
 use block_mesh_common::constants::DeviceType;
 use block_mesh_common::interfaces::server_api::{
     OptCreds, ReportBandwidthRequest, ReportBandwidthResponse,
 };
-use block_mesh_common::reqwest::http_client;
 use block_mesh_common::routes_enum::RoutesEnum;
 use leptos::*;
 use leptos_dom::tracing;

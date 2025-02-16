@@ -5,7 +5,7 @@ use std::rc::Rc;
 use std::str::FromStr;
 use std::time::Duration;
 
-use block_mesh_common::reqwest::http_client;
+use crate::utils::requests::http_client;
 use chrono::Utc;
 use gloo_utils::format::JsValueSerdeExt;
 use leptos::logging::log;

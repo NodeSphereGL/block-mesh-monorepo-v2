@@ -1,8 +1,8 @@
 use crate::utils::extension_wrapper_state::ExtensionWrapperState;
+use crate::utils::requests::http_client;
 use anyhow::anyhow;
 use block_mesh_common::constants::DeviceType;
 use block_mesh_common::interfaces::server_api::DigestDataRequest;
-use block_mesh_common::reqwest::http_client;
 use leptos::logging::log;
 use solana_sdk::signature::{Keypair, Signer};
 use std::str::FromStr;

@@ -34,7 +34,12 @@ lettre = { workspace = true, optional = true }
 aws-config = { workspace = true, optional = true }
 aws-sdk-sesv2 = { workspace = true, optional = true }
 
-reqwest = { workspace = true }
+reqwest = { workspace = true, optional = true, default-features = false, features = [
+  "json",
+  "rustls-tls",
+  "socks",
+  "cookies"
+] }
 ipgeolocate = { workspace = true, optional = true }
 
 [dependencies.uuid]
@@ -53,6 +58,7 @@ clap = ["dep:clap"]
 cli = ["dep:clap", "dep:solana-sdk"]
 app-config = ["dep:clap", "dep:solana-sdk"]
 ip-data = ["dep:ipgeolocate", "dep:reqwest"]
+reqwest = ["dep:reqwest"]
 feature-flag = ["dep:reqwest"]
 env = ["dep:dotenv"]
 email-client = ["dep:lettre", "dep:aws-config", "aws-sdk-sesv2"]

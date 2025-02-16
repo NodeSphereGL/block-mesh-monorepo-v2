@@ -1,9 +1,9 @@
+use crate::utils::requests::http_client;
 use anyhow::anyhow;
 use block_mesh_common::constants::DeviceType;
 use block_mesh_common::interfaces::server_api::{
     GetTokenResponse, LoginForm, RegisterForm, RegisterResponse,
 };
-use block_mesh_common::reqwest::http_client;
 use block_mesh_common::routes_enum::RoutesEnum;
 
 pub async fn login(
