@@ -4,6 +4,7 @@ use crate::utils::extension_wrapper_state::ExtensionWrapperState;
 use block_mesh_common::chrome_storage::AuthStatus;
 use block_mesh_common::constants::DeviceType;
 use block_mesh_common::interfaces::server_api::{ReportUptimeRequest, ReportUptimeResponse};
+use block_mesh_common::reqwest::http_client;
 use block_mesh_common::routes_enum::RoutesEnum;
 use leptos::*;
 use logger_leptos::leptos_tracing::setup_leptos_tracing;
@@ -51,9 +52,10 @@ pub async fn report_uptime_inner(
         ip: ip.clone(),
     };
 
+    let client = http_client(DeviceType::Extension);
     match operation_mode {
         OperationMode::Http => {
-            if let Ok(response) = reqwest::Client::new()
+            if let Ok(response) = client
                 .post(format!(
                     "{}/{}/api{}",
                     base_url,

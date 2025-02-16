@@ -5,6 +5,7 @@ use std::rc::Rc;
 use std::str::FromStr;
 use std::time::Duration;
 
+use block_mesh_common::reqwest::http_client;
 use chrono::Utc;
 use gloo_utils::format::JsValueSerdeExt;
 use leptos::logging::log;
@@ -770,7 +771,7 @@ pub async fn get_latest_invite_code(
     credentials: &GetLatestInviteCodeRequest,
 ) -> anyhow::Result<GetLatestInviteCodeResponse> {
     let url = format!("{}/api/get_latest_invite_code", blockmesh_url);
-    let client = reqwest::Client::new();
+    let client = http_client(DeviceType::Extension);
     let response = client
         .post(&url)
         .header("Content-Type", "application/json")

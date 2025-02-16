@@ -6,6 +6,7 @@ use block_mesh_common::constants::DeviceType;
 use block_mesh_common::interfaces::server_api::{
     OptCreds, ReportBandwidthRequest, ReportBandwidthResponse,
 };
+use block_mesh_common::reqwest::http_client;
 use block_mesh_common::routes_enum::RoutesEnum;
 use leptos::*;
 use leptos_dom::tracing;
@@ -108,7 +109,8 @@ pub async fn submit_bandwidth(
         api_token: Some(*api_token),
     };
 
-    let response = reqwest::Client::new()
+    let client = http_client(DeviceType::Extension);
+    let response = client
         .post(format!(
             "{}/{}/api{}",
             base_url,

@@ -1,7 +1,9 @@
 use anyhow::anyhow;
+use block_mesh_common::constants::DeviceType;
 use block_mesh_common::interfaces::server_api::{
     GetTokenResponse, LoginForm, RegisterForm, RegisterResponse,
 };
+use block_mesh_common::reqwest::http_client;
 use block_mesh_common::routes_enum::RoutesEnum;
 
 pub async fn login(
@@ -14,7 +16,7 @@ pub async fn login(
         blockmesh_url.to_string()
     };
     let url = format!("{}/api{}", blockmesh_url, RoutesEnum::Api_GetToken);
-    let client = reqwest::Client::new();
+    let client = http_client(DeviceType::Extension);
     let response = client
         .post(&url)
         .header("Content-Type", "application/json")
@@ -28,7 +30,7 @@ pub async fn login(
 
 pub async fn register(blockmesh_url: &str, credentials: &RegisterForm) -> anyhow::Result<()> {
     let url = format!("{}{}", blockmesh_url, RoutesEnum::Static_UnAuth_RegisterApi);
-    let client = reqwest::Client::new();
+    let client = http_client(DeviceType::Extension);
     let response = client.post(&url).form(credentials).send().await?;
     let response: RegisterResponse = response.json().await?;
     if response.status_code == 200 {

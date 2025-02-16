@@ -1,27 +1,39 @@
-use crate::background::ws::channel::{get_tx, setup_channels};
-use crate::background::ws::websocket::set_ws_status;
+use crate::background::ws::channel::get_tx;
+use crate::background::ws::websocket::{set_ws_status, BridgedWebSocket}; // Import BridgedWebSocket
 use crate::utils::extension_wrapper_state::ExtensionWrapperState;
 use crate::utils::log::{log, log_error};
 use block_mesh_common::interfaces::ws_api::WsServerMessage;
+use js_sys::{ArrayBuffer, JsString, Uint8Array};
 use serde::{Deserialize, Serialize};
 use std::cmp::PartialEq;
 use std::fmt::{Display, Formatter};
 use wasm_bindgen::convert::IntoWasmAbi;
 use wasm_bindgen::describe::WasmDescribe;
 use wasm_bindgen::prelude::*;
-use web_sys::{CloseEvent, ErrorEvent, MessageEvent};
+use web_sys::{CloseEvent, ErrorEvent, MessageEvent}; // Import necessary types
 
 pub fn on_message_handler(
-    ws: web_sys::WebSocket,
+    ws: BridgedWebSocket, // Use BridgedWebSocket
     _app_state: ExtensionWrapperState,
 ) -> Closure<dyn FnMut(MessageEvent)> {
     Closure::<dyn FnMut(_)>::new(move |e: MessageEvent| {
         log!("on_message_handle e.data() => {:#?}", e.data());
-        if let Ok(txt) = e.data().dyn_into::<js_sys::JsString>() {
+
+        // Attempt to convert the message data to a string or binary data
+        let message_text = e
+            .data()
+            .dyn_into::<JsString>()
+            .map(|js_string| js_string.as_string());
+        let message_binary = e.data().dyn_into::<ArrayBuffer>().map(|array_buffer| {
+            let array = Uint8Array::new(&array_buffer);
+            array.to_vec()
+        });
+
+        if let Some(txt) = message_text {
             if txt == "ping" {
                 let _ = ws.send_with_str("pong");
             }
-            match WsServerMessage::try_from(txt.as_string().unwrap_or_default()) {
+            match WsServerMessage::try_from(txt.unwrap_or_default()) {
                 Ok(msg) => {
                     log!("on_message msg => {:#?}", msg);
                     if let Some(tx) = get_tx() {
@@ -34,15 +46,20 @@ pub fn on_message_handler(
                     log_error!("on_message_handle js error => {:#?} | txt = {}", error, txt);
                 }
             }
+        } else if let Some(binary_data) = message_binary {
+            // Handle binary data
+            log!("Received binary data: {:?}", binary_data);
+            // You can process the binary data here
         } else {
             log_error!("message event, received Unknown: {:?}", e.data());
         }
     })
 }
 
-pub fn on_error_handler(ws: web_sys::WebSocket) -> Closure<dyn FnMut(ErrorEvent)> {
+pub fn on_error_handler(ws: BridgedWebSocket) -> Closure<dyn FnMut(ErrorEvent)> {
+    // Use BridgedWebSocket
     Closure::<dyn FnMut(_)>::new(move |e: ErrorEvent| {
-        let state: WebSocketReadyState = ws.ready_state().into();
+        let state: WebSocketReadyState = WebSocketReadyState::INVALID; // Can't get ready state
         set_ws_status(&state);
         log_error!(
             "on_error_handler:: closing ws with error error event: {:?} | {:?}",
@@ -52,21 +69,23 @@ pub fn on_error_handler(ws: web_sys::WebSocket) -> Closure<dyn FnMut(ErrorEvent)
     })
 }
 
-pub fn on_open_handler(ws: web_sys::WebSocket) -> Closure<dyn FnMut()> {
-    Closure::<dyn FnMut()>::new(move || match ws.clone().send_with_str("ping") {
+pub fn on_open_handler(ws: BridgedWebSocket) -> Closure<dyn FnMut()> {
+    // Use BridgedWebSocket
+    Closure::<dyn FnMut()>::new(move || match ws.send_with_str("ping") {
         Ok(_) => {
             log!("Sent a ping message.");
-            setup_channels(ws.clone());
-            let state: WebSocketReadyState = ws.ready_state().into();
+            //setup_channels(ws.clone()); // You might need to adapt setup_channels
+            let state: WebSocketReadyState = WebSocketReadyState::OPEN;
             set_ws_status(&state);
         }
         Err(err) => log_error!("error sending message: {:?}", err),
     })
 }
 
-pub fn on_close_handler(ws: web_sys::WebSocket) -> Closure<dyn FnMut(CloseEvent)> {
+pub fn on_close_handler(ws: BridgedWebSocket) -> Closure<dyn FnMut(CloseEvent)> {
+    // Use BridgedWebSocket
     Closure::<dyn FnMut(_)>::new(move |e: CloseEvent| {
-        let state: WebSocketReadyState = ws.ready_state().into();
+        let state: WebSocketReadyState = WebSocketReadyState::CLOSED; // Can't get ready state
         set_ws_status(&state);
         log_error!(
             "on_close_handler:: closing ws with error error event: {:?} | {:?} | {:?}",

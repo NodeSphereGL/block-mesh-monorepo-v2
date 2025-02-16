@@ -3,11 +3,13 @@ use block_mesh_common::constants::DeviceType;
 use block_mesh_common::interfaces::server_api::{
     GetTaskRequest, GetTaskResponse, RunTaskResponse, SubmitTaskRequest, SubmitTaskResponse,
 };
+use block_mesh_common::reqwest::http_client;
 use block_mesh_common::routes_enum::RoutesEnum;
 use leptos::*;
 use leptos_dom::tracing;
 use reqwest::header::{HeaderMap, HeaderName, HeaderValue};
 use serde_json::Value;
+// use solana_sdk::client;
 use speed_test::Metadata;
 use std::str::FromStr;
 use uuid::Uuid;
@@ -23,7 +25,8 @@ pub async fn get_task(
         api_token: *api_token,
     };
 
-    let response: Option<GetTaskResponse> = reqwest::Client::new()
+    let client = http_client(DeviceType::Extension);
+    let response: Option<GetTaskResponse> = client
         .post(format!(
             "{}/{}/api{}",
             base_url,
@@ -46,7 +49,7 @@ pub async fn run_task(
     headers: Option<Value>,
     body: Option<Value>,
 ) -> anyhow::Result<RunTaskResponse> {
-    let client = reqwest::Client::new();
+    let client = http_client(DeviceType::Extension);
     let mut client = match method {
         "GET" => client.get(url),
         "POST" => match body {
@@ -113,7 +116,8 @@ pub async fn submit_task(
         response_time: Option::from(response_time),
         response_body: None,
     };
-    let response = reqwest::Client::new()
+    let client = http_client(DeviceType::Extension);
+    let response = client
         .post(format!(
             "{}/{}/api{}",
             base_url,

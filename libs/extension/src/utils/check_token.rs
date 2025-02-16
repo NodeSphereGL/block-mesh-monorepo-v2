@@ -1,5 +1,6 @@
 use block_mesh_common::constants::DeviceType;
 use block_mesh_common::interfaces::server_api::CheckTokenRequest;
+use block_mesh_common::reqwest::http_client;
 use block_mesh_common::routes_enum::RoutesEnum;
 
 #[allow(dead_code)]
@@ -18,7 +19,7 @@ pub async fn check_token(
         DeviceType::Extension,
         RoutesEnum::Api_CheckToken
     );
-    let client = reqwest::Client::new();
+    let client = http_client(DeviceType::Extension);
     let r = client
         .post(&url)
         .header("Content-Type", "application/json")

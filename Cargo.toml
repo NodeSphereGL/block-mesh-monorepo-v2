@@ -194,7 +194,9 @@ futures = { version = "0.3" }
 futures-util = { version = "0.3", default-features = false, features = ["sink", "std"] }
 headers = { version = "0.4.0" }
 tokio = { version = "1.0", features = ["full"] }
-tokio-tungstenite = { version = "0.26.1" }
+tokio-socks5 = { version = "0.4" }
+tokio-tungstenite = { version = "0.26.1", features = ["native-tls"] }
+tungstenite = { version = "0.26.1" }
 tower = { version = "0.4.13", features = ["util"] }
 tower-http = { version = "0.5.1", features = ["fs", "trace", "request-id", "util", "cors", "add-extension"] }
 tracing = { version = "0.1" }
@@ -216,7 +218,7 @@ serde = { version = "1.0.164", features = ["derive"] }
 anyhow = { version = "1.0.71" }
 thiserror = { version = "1.0.40" }
 dotenv = { version = "0.15.0" }
-reqwest = { version = "0.12.5", default-features = false, features = ["cookies"] }
+reqwest = { version = "0.12.5", default-features = false, features = ["cookies", "socks"] }
 bytes = { version = "1.5.0" }
 argon2 = { version = "0.5.0", features = ["std"] }
 validator = { version = "0.16", features = ["derive"] }
@@ -282,4 +284,3 @@ features = [
   "serde", # Enable serialization/deserialization of UUIDs
   "js", # Enable UUID generation in WebAssembly
 ]
-
